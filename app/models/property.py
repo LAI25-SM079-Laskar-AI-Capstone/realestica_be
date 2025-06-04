@@ -2,7 +2,7 @@
 # app/models/property.py
 # ================================
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Text
-from datetime import datetime
+from datetime import datetime, timezone
 from app.database import Base
 
 class PropertyModel(Base):
@@ -35,5 +35,5 @@ class PropertyModel(Base):
     property_condition = Column(String, nullable=False)
     
     nearby_points_of_interest_text = Column(Text, nullable=True)
-    createdAt = Column(DateTime, default=datetime.now(datetime.timezone.utc))
-    updatedAt = Column(DateTime, default=datetime.now(datetime.timezone.utc), onupdate=datetime.utcnow)
+    createdAt = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updatedAt = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

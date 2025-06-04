@@ -1,11 +1,11 @@
 import os
 from typing import Optional
+from dotenv import load_dotenv
 
+load_dotenv() 
 class Settings:
     # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL"
-    )
+    DATABASE_URL: str = os.getenv("DATABASE_URL")
     
     # API
     API_V1_STR: str = "/api/v1"
