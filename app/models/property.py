@@ -35,5 +35,5 @@ class PropertyModel(Base):
     property_condition = Column(String, nullable=False)
     
     nearby_points_of_interest_text = Column(Text, nullable=True)
-    createdAt = Column(DateTime, default=datetime.utcnow)
-    updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    createdAt = Column(DateTime, default=datetime.now(datetime.timezone.utc))
+    updatedAt = Column(DateTime, default=datetime.now(datetime.timezone.utc), onupdate=datetime.utcnow)

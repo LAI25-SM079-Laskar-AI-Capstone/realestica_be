@@ -3,7 +3,7 @@
 # ================================
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from typing import Optional
 from datetime import datetime
 
@@ -19,6 +19,7 @@ router = APIRouter()
 
 @router.get("/", response_model=PropertiesListResponse)
 async def get_properties(
+    filter: Optional[str] = Query(None, description="Search in title or description"),
     location_text: Optional[str] = Query(None, description="Filter by location"),
     property_type: Optional[str] = Query(None, pattern="^(House|Apartment|Other)$", description="Filter by property type"),
     bedrooms: Optional[int] = Query(None, ge=1, description="Filter by number of bedrooms"),
@@ -36,6 +37,15 @@ async def get_properties(
         query = db.query(PropertyModel)
         
         # Apply filters
+        if filter:
+            search_term = f"%{filter}%"
+            query = query.filter(
+                or_(
+                    PropertyModel.title.ilike(search_term),
+                    PropertyModel.description.ilike(search_term)
+                )
+            )
+        
         if location_text:
             query = query.filter(PropertyModel.location_text.ilike(f"%{location_text}%"))
         
