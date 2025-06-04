@@ -1,4 +1,3 @@
-
 # Property Management API
 
 Simple CRUD API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.

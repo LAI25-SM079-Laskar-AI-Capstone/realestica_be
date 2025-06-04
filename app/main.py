@@ -14,14 +14,14 @@ Base.metadata.create_all(bind=engine)
 # FastAPI App
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Simple CRUD API for Property Management",
+    description="Realestica API",
     version=settings.PROJECT_VERSION
 )
 
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # buka untuk semua origin
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
