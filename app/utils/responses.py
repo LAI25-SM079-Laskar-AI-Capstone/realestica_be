@@ -107,3 +107,12 @@ def property_to_response(property_model) -> dict:
         createdAt=property_model.createdAt,
         updatedAt=property_model.updatedAt
     )
+    
+def format_currency(amount: float) -> str:
+    """Format angka menjadi format Rupiah"""
+    if amount >= 1_000_000_000:
+        return f"Rp {amount/1_000_000_000:.2f} Miliar"
+    elif amount >= 1_000_000:
+        return f"Rp {amount/1_000_000:.2f} Juta"
+    else:
+        return f"Rp {amount:,.2f}"

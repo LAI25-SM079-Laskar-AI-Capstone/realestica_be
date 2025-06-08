@@ -7,7 +7,8 @@ from .property import (
     ApiResponse,
     PaginationMeta,
     PropertiesListResponse,
-    PropertyStatsResponse
+    PropertyStatsResponse,
+    PropertyFeatures
 )
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "ApiResponse",
     "PaginationMeta",
     "PropertiesListResponse",
-    "PropertyStatsResponse"
+    "PropertyStatsResponse",
+    "PropertyFeatures"
 ]

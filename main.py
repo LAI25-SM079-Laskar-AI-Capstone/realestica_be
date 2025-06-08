@@ -1,534 +1,138 @@
-# main.py
-from fastapi import FastAPI, HTTPException, Query, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, JSON, Text, func
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from pydantic import BaseModel, Field
-from typing import Optional, List, Union, Any
-from datetime import datetime
-import json
+# # main.py
 
-# Database Configuration
-password = "CbM8qZp3W3K1zYpm"
-database_url = f"postgresql://postgres.wodlrtysmleajqytwbnu:{password}@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
-engine = create_engine(database_url)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+# from fastapi import FastAPI, HTTPException
+# from pydantic import BaseModel
+# import pandas as pd
+# import numpy as np
+# import joblib
+# from huggingface_hub import hf_hub_download
 
-# FastAPI App
-app = FastAPI(
-    title="Property Management API",
-    description="Simple CRUD API for Property Management",
-    version="1.0.0"
-)
+# # --- Inisialisasi FastAPI ---
+# app = FastAPI(title="Property Price Prediction API")
 
-# CORS Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# # --- Unduh dan muat model dan pre-processing object dari Hugging Face Hub ---
+# le_kabupaten_path = hf_hub_download("stevencmichael/Capstone_Project_SM079-LAI", "le_kabupaten.joblib")
+# le_sertifikat_path = hf_hub_download("stevencmichael/Capstone_Project_SM079-LAI", "le_sertifikat.joblib")
+# scaler_path = hf_hub_download("stevencmichael/Capstone_Project_SM079-LAI", "standard_scaler.joblib")
+# model_path = hf_hub_download("stevencmichael/Capstone_Project_SM079-LAI", "model.joblib")
 
-# Database Models
-class PropertyModel(Base):
-    __tablename__ = "property"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(Text, nullable=False)
-    monthly_installment_info = Column(String, nullable=True)
-    price_display = Column(String, nullable=False)
-    price_numeric = Column(Float, nullable=False)
-    location_text = Column(String, nullable=False)
-    estimated_savings = Column(String, nullable=True)
-    posted_by = Column(String, nullable=False)
-    source_url = Column(String, nullable=False)
-    property_type = Column(String, nullable=False)
-    facilities = Column(JSON, nullable=True)
-    
-    # Specifications as separate columns
-    bedrooms = Column(Integer, nullable=False)
-    bathrooms = Column(Integer, nullable=False)
-    land_area = Column(String, nullable=False)
-    building_area = Column(String, nullable=False)
-    carport_capacity = Column(Integer, nullable=True)
-    certificate_type = Column(String, nullable=False)
-    electricity_power = Column(String, nullable=False)
-    maid_bedrooms = Column(Integer, nullable=True)
-    maid_bathrooms = Column(Integer, nullable=True)
-    number_of_floors = Column(Integer, nullable=False)
-    property_condition = Column(String, nullable=False)
-    
-    nearby_points_of_interest_text = Column(Text, nullable=True)
-    createdAt = Column(DateTime, default=datetime.utcnow)
-    updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+# loaded_le_kabupaten = joblib.load(le_kabupaten_path)
+# loaded_le_sertifikat = joblib.load(le_sertifikat_path)
+# loaded_scaler = joblib.load(scaler_path)
+# loaded_model = joblib.load(model_path)
 
-# Pydantic Models
-class PropertySpecifications(BaseModel):
-    bedrooms: int
-    bathrooms: int
-    land_area: str
-    building_area: str
-    carport_capacity: Optional[int] = None
-    certificate_type: str
-    electricity_power: str
-    maid_bedrooms: Optional[int] = None
-    maid_bathrooms: Optional[int] = None
-    number_of_floors: int
-    property_condition: str
+# # --- Daftar kolom yang dibutuhkan oleh model ---
+# MODEL_FEATURES = [
+#     'f_taman', 'f_jogging_track', 'f_cctv', 'f_lapangan_voli', 'f_lapangan_bola',
+#     'f_lapangan_basket', 'f_lapangan_bulu_tangkis', 'f_tempat_jemuran', 'f_kulkas',
+#     'f_telepon', 'f_tempat_cuci', 'f_laundry', 'f_masjid', 'f_taman_bermain',
+#     'f_kolam_renang', 'f_mesin_cuci', 'f_kompor', 'f_keamanan_24_jam', 'f_kolam_ikan',
+#     'f_backyard', 'f_kitchen_set', 'f_teras', 'f_wastafel', 'f_akses_parkir',
+#     'f_lapangan_tenis', 'f_tempat_gym', 'f_ac', 'f_water_heater', 'f_one_gate_system',
+#     's_jumlah_lantai', 's_kamar_mandi', 's_kamar_tidur', 's_luas_bangunan', 's_luas_tanah',
+#     'poi_perbelanjaan', 'poi_sekolah', 'poi_transportasi',
+#     'kabupaten', 's_sertifikat'
+# ]
 
-class PropertyBase(BaseModel):
-    title: str
-    description: str
-    monthly_installment_info: Optional[str] = None
-    price_display: str
-    price_numeric: float
-    location_text: str
-    estimated_savings: Optional[str] = None
-    posted_by: str
-    source_url: str
-    property_type: str = Field(..., pattern="^(House|Apartment|Other)$")
-    facilities: Optional[List[str]] = None
-    specifications: PropertySpecifications
-    nearby_points_of_interest: Optional[dict] = None
+# # --- Skema data input ---
+# class PropertyFeatures(BaseModel):
+#     f_taman: int
+#     f_jogging_track: int
+#     f_cctv: int
+#     f_lapangan_voli: int
+#     f_lapangan_bola: int
+#     f_lapangan_basket: int
+#     f_lapangan_bulu_tangkis: int
+#     f_tempat_jemuran: int
+#     f_kulkas: int
+#     f_telepon: int
+#     f_tempat_cuci: int
+#     f_laundry: int
+#     f_masjid: int
+#     f_taman_bermain: int
+#     f_kolam_renang: int
+#     f_mesin_cuci: int
+#     f_kompor: int
+#     f_keamanan_24_jam: int
+#     f_kolam_ikan: int
+#     f_backyard: int
+#     f_kitchen_set: int
+#     f_teras: int
+#     f_wastafel: int
+#     f_akses_parkir: int
+#     f_lapangan_tenis: int
+#     f_tempat_gym: int
+#     f_ac: int
+#     f_water_heater: int
+#     f_one_gate_system: int
+#     s_jumlah_lantai: int
+#     s_kamar_mandi: int
+#     s_kamar_tidur: int
+#     s_luas_bangunan: float
+#     s_luas_tanah: float
+#     poi_perbelanjaan: float
+#     poi_sekolah: float
+#     poi_transportasi: float
+#     kabupaten: str
+#     s_sertifikat: str
 
-class PropertyCreate(PropertyBase):
-    pass
+# # --- Endpoint prediksi ---
+# @app.post("/predict")
+# def predict_price(features: PropertyFeatures):
+#     try:
+#         # Konversi input JSON ke DataFrame
+#         input_data = pd.DataFrame([features.dict()])
 
-class PropertyUpdate(PropertyBase):
-    pass
+#         # Pre-processing
+#         # Lowercase dan strip untuk kolom string
+#         input_data['kabupaten'] = input_data['kabupaten'].str.lower().str.strip()
+#         input_data['s_sertifikat'] = input_data['s_sertifikat'].str.lower().str.strip()
 
-class PropertyResponse(PropertyBase):
-    id: int
-    createdAt: datetime
-    updatedAt: datetime
+#         # Handle kabupaten tidak dikenal
+#         known_kabupaten = loaded_le_kabupaten.classes_
+#         if not input_data.loc[0, 'kabupaten'] in known_kabupaten:
+#             input_data.loc[0, 'kabupaten'] = known_kabupaten[0]
 
-    class Config:
-        from_attributes = True
+#         # Handle s_sertifikat tidak dikenal
+#         known_sertifikat = loaded_le_sertifikat.classes_
+#         if not input_data.loc[0, 's_sertifikat'] in known_sertifikat:
+#             input_data.loc[0, 's_sertifikat'] = known_sertifikat[0]
 
-# Standard API Response Models
-class ApiResponse(BaseModel):
-    status: str = Field(..., pattern="^(success|fail|error)$")
-    data: Optional[Any] = None
-    error: Optional[dict] = None
+#         # Encoding
+#         input_data['kabupaten_encoded'] = loaded_le_kabupaten.transform(input_data['kabupaten'])
+#         input_data['s_sertifikat_encoded'] = loaded_le_sertifikat.transform(input_data['s_sertifikat'])
 
-class PaginationMeta(BaseModel):
-    total: int
-    limit: int
-    offset: int
-    has_next: bool
-    has_prev: bool
+#         # Hapus kolom asli string
+#         input_data = input_data.drop(['kabupaten', 's_sertifikat'], axis=1)
 
-class PropertiesListResponse(BaseModel):
-    status: str = Field(default="success")
-    data: List[PropertyResponse]
-    meta: PaginationMeta
-    error: Optional[dict] = None
+#         # Urutkan kolom sesuai model
+#         final_features = [
+#             'f_taman', 'f_jogging_track', 'f_cctv', 'f_lapangan_voli', 'f_lapangan_bola',
+#             'f_lapangan_basket', 'f_lapangan_bulu_tangkis', 'f_tempat_jemuran', 'f_kulkas',
+#             'f_telepon', 'f_tempat_cuci', 'f_laundry', 'f_masjid', 'f_taman_bermain',
+#             'f_kolam_renang', 'f_mesin_cuci', 'f_kompor', 'f_keamanan_24_jam', 'f_kolam_ikan',
+#             'f_backyard', 'f_kitchen_set', 'f_teras', 'f_wastafel', 'f_akses_parkir',
+#             'f_lapangan_tenis', 'f_tempat_gym', 'f_ac', 'f_water_heater', 'f_one_gate_system',
+#             's_jumlah_lantai', 's_kamar_mandi', 's_kamar_tidur', 's_luas_bangunan', 's_luas_tanah',
+#             'poi_perbelanjaan', 'poi_sekolah', 'poi_transportasi',
+#             'kabupaten_encoded', 's_sertifikat_encoded'
+#         ]
+#         input_data = input_data[final_features]
 
-class PropertyStatsResponse(BaseModel):
-    status: str = Field(default="success")
-    data: dict
-    error: Optional[dict] = None
+#         # Scaling
+#         scaled_data = loaded_scaler.transform(input_data)
 
-# Database Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+#         # Prediksi
+#         prediction = loaded_model.predict(scaled_data)
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+#         return {
+#             "prediksi_harga": float(prediction[0]),
+#             "status": "success"
+#         }
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error during prediction: {str(e)}")
 
-# Helper functions
-def create_error_response(code: int, message: str, details: Optional[dict] = None):
-    error_data = {"code": code, "message": message}
-    if details:
-        error_data["details"] = details
-    return {"status": "error", "data": None, "error": error_data}
-
-def create_success_response(data: Any):
-    return {"status": "success", "data": data, "error": None}
-
-def parse_nearby_points_of_interest(poi_text: str) -> dict:
-    """Parse nearby points of interest text into structured format"""
-    if not poi_text:
-        return {}
-    
-    result = {}
-    
-    # Split by semicolon to get different categories
-    categories = [cat.strip() for cat in poi_text.split(';') if cat.strip()]
-    
-    for category in categories:
-        if ':' in category:
-            # Split category name and items
-            category_name, items_str = category.split(':', 1)
-            category_name = category_name.strip().lower()
-            
-            # Split items by comma and clean them
-            items = [item.strip() for item in items_str.split(',') if item.strip()]
-            
-            if items:
-                result[category_name] = items
-    
-    return result
-
-def property_to_response(property_model: PropertyModel) -> PropertyResponse:
-    # Handle facilities field - convert string to list if needed
-    facilities = []
-    if property_model.facilities:
-        if isinstance(property_model.facilities, list):
-            # If it's already a list, flatten and clean each item
-            for item in property_model.facilities:
-                if isinstance(item, str):
-                    # Split by semicolon and clean each facility
-                    split_facilities = [facility.strip() for facility in item.split(';') if facility.strip()]
-                    facilities.extend(split_facilities)
-                else:
-                    facilities.append(str(item))
-        elif isinstance(property_model.facilities, str):
-            # If it's a string, split by semicolon first, then by comma as fallback
-            if ';' in property_model.facilities:
-                facilities = [facility.strip() for facility in property_model.facilities.split(';') if facility.strip()]
-            else:
-                facilities = [facility.strip() for facility in property_model.facilities.split(',') if facility.strip()]
-            
-            # If no splitting worked, treat as single item
-            if not facilities:
-                facilities = [property_model.facilities.strip()]
-    
-    # Remove duplicates while preserving order
-    seen = set()
-    unique_facilities = []
-    for facility in facilities:
-        if facility not in seen:
-            seen.add(facility)
-            unique_facilities.append(facility)
-    
-    # Parse nearby points of interest
-    nearby_points_of_interest = parse_nearby_points_of_interest(
-        property_model.nearby_points_of_interest_text or ""
-    )
-    
-    specifications = PropertySpecifications(
-        bedrooms=property_model.bedrooms,
-        bathrooms=property_model.bathrooms,
-        land_area=property_model.land_area,
-        building_area=property_model.building_area,
-        carport_capacity=property_model.carport_capacity,
-        certificate_type=property_model.certificate_type,
-        electricity_power=property_model.electricity_power,
-        maid_bedrooms=property_model.maid_bedrooms,
-        maid_bathrooms=property_model.maid_bathrooms,
-        number_of_floors=property_model.number_of_floors,
-        property_condition=property_model.property_condition
-    )
-    
-    return PropertyResponse(
-        id=property_model.id,
-        title=property_model.title,
-        description=property_model.description,
-        monthly_installment_info=property_model.monthly_installment_info,
-        price_display=property_model.price_display,
-        price_numeric=property_model.price_numeric,
-        location_text=property_model.location_text,
-        estimated_savings=property_model.estimated_savings,
-        posted_by=property_model.posted_by,
-        source_url=property_model.source_url,
-        property_type=property_model.property_type,
-        facilities=unique_facilities,
-        specifications=specifications,
-        nearby_points_of_interest=nearby_points_of_interest,  # Changed from nearby_points_of_interest_text
-        createdAt=property_model.createdAt,
-        updatedAt=property_model.updatedAt
-    )
-    
-# API Endpoints
-
-@app.get("/", tags=["Root"])
-async def root():
-    return create_success_response({
-        "message": "Property Management API", 
-        "version": "1.0.0"
-    })
-
-@app.get("/properties", response_model=PropertiesListResponse, tags=["Properties"])
-async def get_properties(
-    location_text: Optional[str] = Query(None, description="Filter by location"),
-    property_type: Optional[str] = Query(None, pattern="^(House|Apartment|Other)$", description="Filter by property type"),
-    bedrooms: Optional[int] = Query(None, ge=1, description="Filter by number of bedrooms"),
-    bathrooms: Optional[int] = Query(None, ge=1, description="Filter by number of bathrooms"),
-    min_price: Optional[float] = Query(None, ge=0, description="Minimum price filter"),
-    max_price: Optional[float] = Query(None, ge=0, description="Maximum price filter"),
-    sort: Optional[str] = Query("desc", pattern="^(asc|desc)$", description="Sort by price (asc/desc)"),
-    limit: int = Query(10, ge=1, le=100, description="Number of properties per page"),
-    offset: int = Query(0, ge=0, description="Starting index for pagination"),
-    db: Session = Depends(get_db)
-):
-    """Get list of properties with filtering, sorting, and pagination"""
-    
-    try:
-        query = db.query(PropertyModel)
-        
-        # Apply filters
-        if location_text:
-            query = query.filter(PropertyModel.location_text.ilike(f"%{location_text}%"))
-        
-        if property_type:
-            query = query.filter(PropertyModel.property_type == property_type)
-        
-        if bedrooms:
-            query = query.filter(PropertyModel.bedrooms == bedrooms)
-        
-        if bathrooms:
-            query = query.filter(PropertyModel.bathrooms == bathrooms)
-        
-        if min_price:
-            query = query.filter(PropertyModel.price_numeric >= min_price)
-        
-        if max_price:
-            query = query.filter(PropertyModel.price_numeric <= max_price)
-        
-        # Apply sorting
-        if sort == "asc":
-            query = query.order_by(PropertyModel.price_numeric.asc())
-        else:
-            query = query.order_by(PropertyModel.price_numeric.desc())
-        
-        # Get total count before pagination
-        total = query.count()
-        
-        # Apply pagination
-        properties = query.offset(offset).limit(limit).all()
-        
-        # Convert to response format
-        property_responses = [property_to_response(prop) for prop in properties]
-        
-        meta = PaginationMeta(
-            total=total,
-            limit=limit,
-            offset=offset,
-            has_next=offset + limit < total,
-            has_prev=offset > 0
-        )
-        
-        return PropertiesListResponse(
-            status="success",
-            data=property_responses,
-            meta=meta,
-            error=None
-        )
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Internal server error", {"exception": str(e)})
-        )
-
-@app.get("/properties/{property_id}", tags=["Properties"])
-async def get_property(property_id: int, db: Session = Depends(get_db)):
-    """Get a specific property by ID"""
-    
-    try:
-        property_model = db.query(PropertyModel).filter(PropertyModel.id == property_id).first()
-        
-        if not property_model:
-            raise HTTPException(
-                status_code=404,
-                detail=create_error_response(404, "Property not found")
-            )
-        
-        return create_success_response(property_to_response(property_model))
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Internal server error", {"exception": str(e)})
-        )
-
-@app.post("/properties", tags=["Properties"], status_code=201)
-async def create_property(property_data: PropertyCreate, db: Session = Depends(get_db)):
-    """Create a new property"""
-    
-    try:
-        # Convert Pydantic model to SQLAlchemy model
-        property_model = PropertyModel(
-            title=property_data.title,
-            description=property_data.description,
-            monthly_installment_info=property_data.monthly_installment_info,
-            price_display=property_data.price_display,
-            price_numeric=property_data.price_numeric,
-            location_text=property_data.location_text,
-            estimated_savings=property_data.estimated_savings,
-            posted_by=property_data.posted_by,
-            source_url=property_data.source_url,
-            property_type=property_data.property_type,
-            facilities=property_data.facilities,
-            bedrooms=property_data.specifications.bedrooms,
-            bathrooms=property_data.specifications.bathrooms,
-            land_area=property_data.specifications.land_area,
-            building_area=property_data.specifications.building_area,
-            carport_capacity=property_data.specifications.carport_capacity,
-            certificate_type=property_data.specifications.certificate_type,
-            electricity_power=property_data.specifications.electricity_power,
-            maid_bedrooms=property_data.specifications.maid_bedrooms,
-            maid_bathrooms=property_data.specifications.maid_bathrooms,
-            number_of_floors=property_data.specifications.number_of_floors,
-            property_condition=property_data.specifications.property_condition,
-            nearby_points_of_interest=property_data.nearby_points_of_interest_text
-        )
-        
-        db.add(property_model)
-        db.commit()
-        db.refresh(property_model)
-        
-        return create_success_response(property_to_response(property_model))
-    
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Failed to create property", {"exception": str(e)})
-        )
-
-@app.put("/properties/{property_id}", tags=["Properties"])
-async def update_property(property_id: int, property_data: PropertyUpdate, db: Session = Depends(get_db)):
-    """Update an existing property"""
-    
-    try:
-        property_model = db.query(PropertyModel).filter(PropertyModel.id == property_id).first()
-        
-        if not property_model:
-            raise HTTPException(
-                status_code=404,
-                detail=create_error_response(404, "Property not found")
-            )
-        
-        # Update fields
-        property_model.title = property_data.title
-        property_model.description = property_data.description
-        property_model.monthly_installment_info = property_data.monthly_installment_info
-        property_model.price_display = property_data.price_display
-        property_model.price_numeric = property_data.price_numeric
-        property_model.location_text = property_data.location_text
-        property_model.estimated_savings = property_data.estimated_savings
-        property_model.posted_by = property_data.posted_by
-        property_model.source_url = property_data.source_url
-        property_model.property_type = property_data.property_type
-        property_model.facilities = property_data.facilities
-        property_model.bedrooms = property_data.specifications.bedrooms
-        property_model.bathrooms = property_data.specifications.bathrooms
-        property_model.land_area = property_data.specifications.land_area
-        property_model.building_area = property_data.specifications.building_area
-        property_model.carport_capacity = property_data.specifications.carport_capacity
-        property_model.certificate_type = property_data.specifications.certificate_type
-        property_model.electricity_power = property_data.specifications.electricity_power
-        property_model.maid_bedrooms = property_data.specifications.maid_bedrooms
-        property_model.maid_bathrooms = property_data.specifications.maid_bathrooms
-        property_model.number_of_floors = property_data.specifications.number_of_floors
-        property_model.property_condition = property_data.specifications.property_condition
-        property_model.nearby_points_of_interest = property_data.nearby_points_of_interest_text
-        property_model.updatedAt = datetime.utcnow()
-        
-        db.commit()
-        db.refresh(property_model)
-        
-        return create_success_response(property_to_response(property_model))
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Failed to update property", {"exception": str(e)})
-        )
-
-@app.delete("/properties/{property_id}", tags=["Properties"])
-async def delete_property(property_id: int, db: Session = Depends(get_db)):
-    """Delete a property"""
-    
-    try:
-        property_model = db.query(PropertyModel).filter(PropertyModel.id == property_id).first()
-        
-        if not property_model:
-            raise HTTPException(
-                status_code=404,
-                detail=create_error_response(404, "Property not found")
-            )
-        
-        db.delete(property_model)
-        db.commit()
-        
-        return create_success_response({"message": "Property deleted successfully"})
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Failed to delete property", {"exception": str(e)})
-        )
-
-# Additional endpoint for property statistics
-@app.get("/properties/stats/summary", response_model=PropertyStatsResponse, tags=["Properties"])
-async def get_property_stats(db: Session = Depends(get_db)):
-    """Get property statistics summary"""
-    
-    try:
-        total_properties = db.query(PropertyModel).count()
-        
-        # Count by property type
-        property_type_stats = db.query(
-            PropertyModel.property_type,
-            func.count(PropertyModel.id).label('count')
-        ).group_by(PropertyModel.property_type).all()
-        
-        # Average price
-        avg_price = db.query(func.avg(PropertyModel.price_numeric)).scalar()
-        
-        # Price range
-        min_price = db.query(func.min(PropertyModel.price_numeric)).scalar()
-        max_price = db.query(func.max(PropertyModel.price_numeric)).scalar()
-        
-        stats_data = {
-            "total_properties": total_properties,
-            "property_types": [{"type": stat[0], "count": stat[1]} for stat in property_type_stats],
-            "average_price": avg_price,
-            "price_range": {
-                "min": min_price,
-                "max": max_price
-            }
-        }
-        
-        return PropertyStatsResponse(
-            status="success",
-            data=stats_data,
-            error=None
-        )
-    
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=create_error_response(500, "Failed to get property statistics", {"exception": str(e)})
-        )
-
-# Health check endpoint
-@app.get("/health", tags=["Health"])
-async def health_check():
-    return create_success_response({
-        "status": "healthy", 
-        "timestamp": datetime.utcnow()
-    })
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# # --- Endpoint Root ---
+# @app.get("/")
+# def read_root():
+#     return {"message": "Property Price Prediction API. Use POST /predict with JSON data."}
