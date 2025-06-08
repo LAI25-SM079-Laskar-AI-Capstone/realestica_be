@@ -1,0 +1,22 @@
+# Virtual environment lokal
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git
+.git/
+.gitignore
+
+# IDE/editor artifacts
+.vscode/
+.idea/
+*.swp
+
+# Lainnya
+*.db
+*.log
+*.DS_Store

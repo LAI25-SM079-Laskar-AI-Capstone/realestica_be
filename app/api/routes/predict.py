@@ -13,10 +13,6 @@ router = APIRouter()
 # Get model manager instance
 model_manager = MLModelManager()
 
-
-
-
-
 @router.post("/", response_model=dict, summary="Prediksi Harga Properti")
 async def predict_property_price(features: PropertyFeatures):
     """
@@ -40,8 +36,7 @@ async def predict_property_price(features: PropertyFeatures):
         # Format response
         response_data = {
             "prediksi_harga": predicted_price,
-            "prediksi_harga_formatted": format_currency(predicted_price),
-            "status": "success"
+            "prediksi_harga_formatted": format_currency(predicted_price)
         }
         
         return create_success_response(data=response_data)

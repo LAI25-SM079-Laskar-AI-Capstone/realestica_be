@@ -42,7 +42,7 @@
     "s_sertifikat": "SHM"
   },
 
-  "// ===== CONTOH 2: Rumah Sederhana di Bandung =====": "",
+  "// ===== CONTOH 2: Rumah Sederhana di Jakarta Timur =====": "",
   "contoh_rumah_sederhana": {
     "f_taman": 0,
     "f_jogging_track": 0,
@@ -81,12 +81,12 @@
     "poi_perbelanjaan": 3.5,
     "poi_sekolah": 2.0,
     "poi_transportasi": 1.5,
-    "kabupaten": "Bandung",
+    "kabupaten": "Jakarta Timur",
     "s_sertifikat": "HGB"
   },
 
-  "// ===== CONTOH 3: Apartemen di Jakarta Pusat =====": "",
-  "contoh_apartemen": {
+  "// ===== CONTOH 3: rumah di Jakarta Pusat =====": "",
+  "contoh_rumah": {
     "f_taman": 1,
     "f_jogging_track": 1,
     "f_cctv": 1,
@@ -125,10 +125,10 @@
     "poi_sekolah": 1.5,
     "poi_transportasi": 0.2,
     "kabupaten": "Jakarta Pusat",
-    "s_sertifikat": "PPJB"
+    "s_sertifikat": "SHM"
   },
 
-  "// ===== CONTOH 4: Rumah Budget di Bekasi =====": "",
+  "// ===== CONTOH 4: Rumah Budget di Jakarta Utara =====": "",
   "contoh_rumah_budget": {
     "f_taman": 0,
     "f_jogging_track": 0,
@@ -167,7 +167,7 @@
     "poi_perbelanjaan": 5.0,
     "poi_sekolah": 3.0,
     "poi_transportasi": 2.0,
-    "kabupaten": "Bekasi",
-    "s_sertifikat": "AJB"
+    "kabupaten": "Jakarta Utara",
+    "s_sertifikat": "Girik"
   }
 }

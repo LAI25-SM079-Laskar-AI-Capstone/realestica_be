@@ -115,9 +115,9 @@ Mendapatkan informasi tentang model ML yang digunakan.
 
 | Field             | Type    | Description        | Range | Required |
 | ----------------- | ------- | ------------------ | ----- | -------- |
-| `s_jumlah_lantai` | integer | Jumlah lantai      | ≥ 1   | ✅       |
-| `s_kamar_mandi`   | integer | Jumlah kamar mandi | ≥ 1   | ✅       |
-| `s_kamar_tidur`   | integer | Jumlah kamar tidur | ≥ 1   | ✅       |
+| `s_jumlah_lantai` | integer | Jumlah lantai      | ≥ 0   | ✅       |
+| `s_kamar_mandi`   | integer | Jumlah kamar mandi | ≥ 0   | ✅       |
+| `s_kamar_tidur`   | integer | Jumlah kamar tidur | ≥ 0   | ✅       |
 | `s_luas_bangunan` | float   | Luas bangunan (m²) | > 0   | ✅       |
 | `s_luas_tanah`    | float   | Luas tanah (m²)    | > 0   | ✅       |
 
@@ -131,10 +131,10 @@ Mendapatkan informasi tentang model ML yang digunakan.
 
 #### 🌍 Lokasi dan Sertifikat
 
-| Field          | Type   | Description               | Required |
-| -------------- | ------ | ------------------------- | -------- |
-| `kabupaten`    | string | Nama kabupaten/kota       | ✅       |
-| `s_sertifikat` | string | Jenis sertifikat properti | ✅       |
+| Field          | Type   | Description               | Required | Constraints                                                                                                                           |
+| -------------- | ------ | ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `kabupaten`    | string | Nama kabupaten/kota       | ✅       | Hanya salah satu dari: `"jakarta barat"`, `"jakarta pusat"`, `"jakarta selatan"`, `"jakarta timur"`, `"jakarta utara"`                |
+| `s_sertifikat` | string | Jenis sertifikat properti | ✅       | Hanya salah satu dari: `"adat"`, `"girik"`, `"hak pakai"`, `"hak sewa"`, `"hgb"`, `"hgu"`, `"lainnya"`, `"ppjb"`, `"shm"`, `"strata"` |
 
 ---
 
@@ -147,8 +147,7 @@ Mendapatkan informasi tentang model ML yang digunakan.
   "status": "success",
   "data": {
     "prediksi_harga": 1250000000.0,
-    "prediksi_harga_formatted": "Rp 1.25 Miliar",
-    "status": "success"
+    "prediksi_harga_formatted": "Rp 1.25 Miliar"
   },
   "timestamp": "2025-06-08T10:30:00Z"
 }
@@ -239,8 +238,7 @@ curl -X POST "http://localhost:8000/predict/" \
   "success": true,
   "data": {
     "prediksi_harga": 4750000000.0,
-    "prediksi_harga_formatted": "Rp 4.75 Miliar",
-    "status": "success"
+    "prediksi_harga_formatted": "Rp 4.75 Miliar"
   },
   "timestamp": "2025-06-08T10:30:00Z"
 }
@@ -301,8 +299,7 @@ curl -X POST "http://localhost:8000/predict/" \
   "success": true,
   "data": {
     "prediksi_harga": 450000000.0,
-    "prediksi_harga_formatted": "Rp 450.00 Juta",
-    "status": "success"
+    "prediksi_harga_formatted": "Rp 450.00 Juta"
   },
   "timestamp": "2025-06-08T10:30:00Z"
 }
@@ -363,8 +360,7 @@ curl -X POST "http://localhost:8000/predict/" \
   "success": true,
   "data": {
     "prediksi_harga": 1850000000.0,
-    "prediksi_harga_formatted": "Rp 1.85 Miliar",
-    "status": "success"
+    "prediksi_harga_formatted": "Rp 1.85 Miliar"
   },
   "timestamp": "2025-06-08T10:30:00Z"
 }
@@ -457,19 +453,30 @@ curl -X GET "http://localhost:8000/predict/model-info"
 
 Model mendukung prediksi untuk berbagai kabupaten/kota di Indonesia. Untuk mendapatkan daftar lengkap, gunakan endpoint `/predict/model-info`.
 
-**Contoh kabupaten yang didukung:**
+**Kabupaten/kota yang didukung:**
 
-- Jakarta Selatan, Jakarta Pusat, Jakarta Barat, Jakarta Utara, Jakarta Timur
-- Bandung, Bekasi, Tangerang, Depok, Bogor
-- Dan banyak lagi...
+- Jakarta Barat
+- Jakarta Pusat
+- Jakarta Selatan
+- Jakarta Timur
+- Jakarta Utara
+
+---
 
 ### Supported Certificate Types
 
-- **SHM** (Sertifikat Hak Milik)
-- **HGB** (Hak Guna Bangunan)
-- **HGU** (Hak Guna Usaha)
-- **SHGB** (Sertifikat Hak Guna Bangunan)
-- **Girik** (Surat Girik)
+Jenis sertifikat properti yang didukung meliputi:
+
+- Adat
+- Girik
+- Hak Pakai
+- Hak Sewa
+- HGB (Hak Guna Bangunan)
+- HGU (Hak Guna Usaha)
+- Lainnya
+- PPJB (Perjanjian Pengikatan Jual Beli)
+- SHM (Sertifikat Hak Milik)
+- Strata
 
 ---
 
@@ -487,13 +494,6 @@ Model mendukung prediksi untuk berbagai kabupaten/kota di Indonesia. Untuk menda
 - Singleton pattern mencegah loading berulang
 - Preprocessing pipeline yang efisien
 - Caching untuk response yang konsisten
-
-### Rate Limiting
-
-Tidak ada rate limiting default, namun disarankan untuk implementasi production:
-
-- **Recommended**: 100 requests/minute per IP
-- **Burst**: 20 requests/second
 
 ---
 
@@ -569,35 +569,6 @@ else:
     cache[prop_hash] = result
 ```
 
-### 5. Production Deployment
-
-- Gunakan HTTPS untuk production
-- Implementasikan rate limiting
-- Monitor response times dan error rates
-- Setup logging untuk debugging
-- Gunakan load balancer untuk high availability
-
----
-
-## 📊 Usage Analytics
-
-### Tracking Recommendations
-
-```python
-# Log prediction requests
-logging.info(f"Prediction request: {kabupaten}, {s_luas_bangunan}m², Price: {predicted_price}")
-
-# Track popular locations
-location_stats = {
-    "jakarta_selatan": 1234,
-    "bandung": 567,
-    "jakarta_pusat": 890
-}
-
-# Monitor prediction accuracy
-# Compare with actual market prices when available
-```
-
 ---
 
 ## 🔧 Troubleshooting
@@ -642,21 +613,6 @@ location_stats = {
 
 ---
 
-## 📞 Support & Contact
-
-### API Support
-
-- **Documentation**: `/docs` (Swagger UI)
-- **Health Check**: `/health`
-- **Model Status**: `/predict/model-info`
-
-### Getting Help
-
-1. Check this documentation first
-2. Verify input data format
-3. Test with provided examples
-4. Check server logs for detailed errors
-
 ---
 
 ## 📈 Changelog
@@ -665,7 +621,6 @@ location_stats = {
 
 - Initial release
 - 39 feature prediction model
-- Support for major Indonesian cities
 - Optimized startup and prediction performance
 
 ---

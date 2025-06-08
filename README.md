@@ -1,6 +1,6 @@
-# Property Management API
+# Realestica Property Management API
 
-Simple CRUD API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.
+Realestica API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.
 
 ## Features
 
@@ -12,6 +12,7 @@ Simple CRUD API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.
 - ✅ CORS support
 - ✅ Pydantic validation
 - ✅ SQLAlchemy ORM
+- ✅ Prediksi harga properti menggunakan model machine learning
 
 ## Tech Stack
 
@@ -20,6 +21,7 @@ Simple CRUD API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.
 - **PostgreSQL** - Database
 - **Pydantic** - Data validation
 - **Uvicorn** - ASGI server
+- **Scikit-learn / ML Model** - Machine learning untuk prediksi harga properti
 
 ## Project Structure
 
@@ -41,10 +43,12 @@ property-management-api/
 │   │   └── routes/
 │   │       ├── __init__.py
 │   │       ├── properties.py   # Property endpoints
+│   │       ├── predict.py   # Prediction endpoints
 │   │       └── health.py       # Health check
 │   ├── core/
 │   │   ├── __init__.py
-│   │   └── config.py           # Konfigurasi
+│   │   ├── config.py           # Konfigurasi
+│   │   └── ml_models.py        # model prediksi
 │   └── utils/
 │       ├── __init__.py
 │       └── responses.py        # Helper functions
@@ -55,6 +59,37 @@ property-management-api/
 ```
 
 ## Installation
+
+### 1. Setup & Run the Application Using Docker from Docker Hub
+
+1. **Make sure Docker is installed and running on your machine.**
+
+2. **Pull the image from Docker Hub:**
+
+```bash
+docker pull mhdrizki0801/realestica-be:latest
+```
+
+3. **Run a container from the pulled image:**
+
+```bash
+docker run -d -p 8000:8000 --name realestica-be mhdrizki0801/realestica-be:latest
+```
+
+4. **Open your browser and access the application at:**
+
+```bash
+http://localhost:8000
+```
+
+5. **Stop and remove the container when you’re done:**
+
+```bash
+docker stop realestica-be
+docker rm realestica-be
+```
+
+### 2. Manual Setup (Virtual Environment)
 
 1. Clone repository:
 
@@ -100,7 +135,7 @@ Setelah aplikasi berjalan, akses dokumentasi API di:
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 
-## API Endpoints
+## 🔗 API Endpoints
 
 ### Properties
 
@@ -111,9 +146,18 @@ Setelah aplikasi berjalan, akses dokumentasi API di:
 - `DELETE /properties/{id}` - Delete property
 - `GET /properties/stats/summary` - Get statistics
 
+### Price Prediction
+
+- `POST /predict/` - Memprediksi harga properti berdasarkan fitur-fitur yang diberikan
+- `GET /predict/model-info` - Mendapatkan informasi tentang model ML yang digunakan
+
 ### Health Check
 
 - `GET /health` - Health check endpoint
+
+<h2 style="background-color: yellow; color: black; padding: 8px; font-size: 1.5em;">
+  Dokumentasi Detail Prediksi Harga ada di file Price_Prediction_Doc.md
+</h2>
 
 ## Query Parameters untuk GET /properties
 

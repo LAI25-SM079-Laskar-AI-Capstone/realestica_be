@@ -1,9 +1,10 @@
 # ================================
 # app/schemas/property.py
 # ================================
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Any
 from datetime import datetime
+from typing import Literal
 
 class PropertySpecifications(BaseModel):
     bedrooms: int
@@ -102,22 +103,51 @@ class PropertyFeatures(BaseModel):
     f_ac: int = Field(ge=0, le=1, description="Fasilitas AC (0/1)")
     f_water_heater: int = Field(ge=0, le=1, description="Fasilitas water heater (0/1)")
     f_one_gate_system: int = Field(ge=0, le=1, description="Fasilitas one gate system (0/1)")
-    
+
     # Spesifikasi properti
-    s_jumlah_lantai: int = Field(ge=1, description="Jumlah lantai")
-    s_kamar_mandi: int = Field(ge=1, description="Jumlah kamar mandi")
-    s_kamar_tidur: int = Field(ge=1, description="Jumlah kamar tidur")
+    s_jumlah_lantai: int = Field(ge=0, description="Jumlah lantai")
+    s_kamar_mandi: int = Field(ge=0, description="Jumlah kamar mandi")
+    s_kamar_tidur: int = Field(ge=0, description="Jumlah kamar tidur")
     s_luas_bangunan: float = Field(gt=0, description="Luas bangunan (m²)")
     s_luas_tanah: float = Field(gt=0, description="Luas tanah (m²)")
-    
+
     # Point of Interest (jarak dalam km)
     poi_perbelanjaan: float = Field(ge=0, description="Jarak ke pusat perbelanjaan (km)")
     poi_sekolah: float = Field(ge=0, description="Jarak ke sekolah (km)")
     poi_transportasi: float = Field(ge=0, description="Jarak ke transportasi umum (km)")
-    
+
     # Lokasi dan sertifikat
     kabupaten: str = Field(description="Nama kabupaten/kota")
     s_sertifikat: str = Field(description="Jenis sertifikat properti")
+
+    # Validator untuk kabupaten
+    @validator("kabupaten")
+    def validate_kabupaten(cls, v):
+        allowed_kabupaten = {
+            "jakarta barat",
+            "jakarta pusat",
+            "jakarta selatan",
+            "jakarta timur",
+            "jakarta utara",
+        }
+        if v.lower() not in allowed_kabupaten:
+            raise ValueError(
+                f"kabupaten harus salah satu dari: {', '.join(sorted(allowed_kabupaten))}"
+            )
+        return v
+
+    # Validator untuk sertifikat
+    @validator("s_sertifikat")
+    def validate_sertifikat(cls, v):
+        allowed_sertifikat = {
+            "adat", "girik", "hak pakai", "hak sewa",
+            "hgb", "hgu", "lainnya", "ppjb", "shm", "strata"
+        }
+        if v.lower() not in allowed_sertifikat:
+            raise ValueError(
+                f"s_sertifikat harus salah satu dari: {', '.join(sorted(allowed_sertifikat))}"
+            )
+        return v
 
     class Config:
         schema_extra = {
