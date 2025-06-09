@@ -2,6 +2,13 @@
 
 Realestica API untuk manajemen properti menggunakan FastAPI dan PostgreSQL.
 
+## Live Demo
+
+You can access the deployed Realestica APIhere:
+> [realesticebe-production.up.railway.app/docs](realesticebe-production.up.railway.app/docs)
+
+Feel free to try it out and explore the features!
+
 ## Features
 
 - ✅ CRUD Operations untuk properti
